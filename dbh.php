@@ -1,15 +1,15 @@
 <?php 
-  $server = "localhost";
-  $username = "root";
-  $password = "";
-  $database = "logintest";
+	
+	$server = "localhost";
+	$username = "root";
+	$password = "";
+	$database = "userprofile";
 
-  //create connection $conn
+	//connect to database
 
-  $conn = mysqli_connect($server, $username, $password, $database);
+	$conn = mysqli_connect($server, $username, $password, $database);
 
-  if(!$conn) {
-  	die("Connection Failed: ".mysqli_connect_error());
-  } 
-
+	if(!$conn) {
+		die("Connection Failed ".mysqli_connect_error());
+	} 
  ?>

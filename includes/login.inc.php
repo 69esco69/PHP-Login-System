@@ -1,48 +1,39 @@
-<?php
-	session_start(); 
-   include "../dbh.php";
-   
-   // user inputs
-   $uid = $_POST['uid'];
-   $pwd = $_POST['pwd'];
+<?php 
+    session_start();
+    include_once "../dbh.php";
 
 
-   //dehashing password
-   $sql = "SELECT * FROM user WHERE uid='$uid'";
-   $result = mysqli_query($conn, $sql);
-   $row = mysqli_fetch_assoc($result);
-   $hash_pwd = $row['pwd'];
-   $hash = password_verify($pwd, $hash_pwd);
+	if(isset($_POST['userSubmit'])) {
 
+		$uid = $_POST['uid'];
+		$pwd = $_POST['pwd'];
 
-   //if has returns false send back to index page
+		//query database
 
-   if($hash == 0) {
+		$sql = "SELECT * FROM user  WHERE uid='$uid' AND pwd ='$pwd'";
 
-      header("Location: ../index.php?error=password");
+		$result = mysqli_query($conn, $sql);
+		$resultCheck = mysqli_num_rows($result);
+		
+		if($resultCheck > 0 ) {
 
-   } else {
+			$row = mysqli_fetch_assoc($result);
+			$_SESSION['id'] = $row['id'];
+			$_SESSION['first'] = $row['first'];
 
-       // else query database ps $hash_pwd instead of $pwd
+			//fetch datafrom profile image
 
-      $sql = "SELECT * FROM user WHERE uid = '$uid' AND pwd = '$hash_pwd' ";
-      $result = mysqli_query($conn, $sql);
-      $row = mysqli_fetch_assoc($result);
+			$sql = "SELECT * FROM profileImg WHERE userid= '".$_SESSION['id']."' ";
 
-      if(!$row) {
+			$result = mysqli_query($conn, $sql);
 
-         header("Location: ../index.php?error=password");
+			$row = mysqli_fetch_assoc($result);
 
-      } else {
+			$_SESSION['status'] = $row['status'];
 
-         $_SESSION['id'] = $row['id'];
-         header("Location: ../welcome.php");
-      }
-    
- 
-   }
+			header("Location: ../index.php");
+		} else {
+			header("Location: ../index.php?errordetails");
+		}
 
-
-
-
- ?>
+	}

@@ -1,67 +1,39 @@
 <?php
- session_start(); 
+	session_start();
+	include_once "../dbh.php";
 
-  include "../dbh.php";
+	if(isset($_POST['submit'])) {
 
-  //user inputs
-  $first = $_POST['first'];
-  $last = $_POST['last'];
-  $uid = $_POST['uid'];
-  $pwd = $_POST['pwd'];
+		$first = $_POST['first'];
+		$last = $_POST['last'];
+		$uid = $_POST['uid'];
+		$pwd = $_POST['pwd'];
 
+		//query database
 
-  // checking if there are empty fields
-  if(empty($first)) {
-  	header("Location: ../signup.php?error=empty");
-  	exit();
-  }
-  if(empty($last)) {
-  	header("Location: ../signup.php?error=empty");
-  	exit();
-  }
+		$sql = "INSERT INTO user (first, last, uid, pwd) VALUES('$first', '$last', '$uid', '$pwd')";
+        mysqli_query($conn, $sql);
 
-  if(empty($uid)) {
-  	header("Location: ../signup.php?error=empty");
-  	exit();
-  }
+        //set status to zero
 
-  if(empty($pwd)) {
+        $sql = "SELECT * FROM user WHERE uid='$uid' AND pwd='$pwd'";
 
-  	header("Location: ../signup.php?error=empty");
+        $result = mysqli_query($conn, $sql);
 
-  	exit();
-  }
+        $resultCheck = mysqli_num_rows($result);
 
-  else {
-   // checking if there is an existing username
-   $sql = "SELECT uid FROM user WHERE uid ='$uid'";
-   $result = mysqli_query($conn, $sql);
-   $uidcheck = mysqli_num_rows($result);
-   
-   //if uidcheck returns true(1) or > 0 then indicate error=username
+        if($resultCheck > 0) {
+        	$row = mysqli_fetch_assoc($result);
+
+        	$id = $row['id'];
+        	$status = 0;
+        	
+        	$sqlPf = "INSERT INTO profileImg(userid, status) VALUE('$id', '$status')";
+        	$reslutPf = mysqli_query($conn, $sqlPf);
 
 
-  	if($uidcheck > 0) {
+        }
 
-               header("Location: ../signup.php?error=username");
-               exit();
+		header("Location: ../index.php?usersignedup");
 
-  	} else {
-  		
-		  //query database
-  		  $encryted_password = password_hash($pwd, PASSWORD_DEFAULT);
-
-		  $sql = "INSERT INTO user (first, last, uid, pwd) VALUES ('$first', '$last', '$uid', '$encryted_password')";
-
-		  $result = mysqli_query($conn, $sql);
-
-		 header("Location: ../index.php");
-		  	}
-
-  
-
-  }
-
- 
-
- ?>
+	}
